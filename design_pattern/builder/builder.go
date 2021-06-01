@@ -25,9 +25,12 @@ type KubernetesBuilder interface {
 	BuildPlugins()
 	BuildSubnet()
 	BuildOther()
+	GetResult() *Kubernetes
 }
 
-type ABuilder struct{}
+type ABuilder struct {
+	k8s *Kubernetes
+}
 
 func (A *ABuilder) BuildPlugins() {
 	panic("implement me")
@@ -41,7 +44,13 @@ func (A *ABuilder) BuildOther() {
 	panic("implement me")
 }
 
-type BBuilder struct{}
+func (A *ABuilder) GetResult() *Kubernetes {
+	return A.k8s
+}
+
+type BBuilder struct {
+	k8s *Kubernetes
+}
 
 func (B *BBuilder) BuildPlugins() {
 	panic("implement me")
@@ -55,24 +64,25 @@ func (B *BBuilder) BuildOther() {
 	panic("implement me")
 }
 
+func (B *BBuilder) GetResult() *Kubernetes {
+	return B.k8s
+}
+
 type Director struct {
 	// 控制创建流程
 }
 
-func (d *Director) MakeXK8s() {
+func (d *Director) MakeXK8s() *Kubernetes {
 	b := new(ABuilder)
 	b.BuildPlugins()
 	b.BuildSubnet()
+	return b.GetResult()
 }
 
-func (d *Director) MakeYK8s() {
+func (d *Director) MakeYK8s() *Kubernetes {
 	b := new(BBuilder)
 	b.BuildSubnet()
 	b.BuildPlugins()
 	b.BuildOther()
-}
-
-func t() {
-	d := new(Director)
-	d.MakeXK8s()
+	return b.GetResult()
 }
